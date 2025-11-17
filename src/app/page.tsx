@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 import Link from "next/link";
 
 // página inicial / landing do sistema
