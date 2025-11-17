@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
+// garante que JWT_SECRET seja sempre uma string
 const JWT_SECRET = process.env.JWT_SECRET ?? "";
 
 if (!JWT_SECRET) {
