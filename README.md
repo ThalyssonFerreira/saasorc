@@ -1,36 +1,229 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SaaSorc – Sistema de Controle Financeiro
 
-## Getting Started
+Demo: https://saasorc.vercel.app/login
 
-First, run the development server:
+## 🏦 Visão geral
+
+O **SaaSorc** é um sistema web de controle financeiro pessoal, onde o usuário pode:
+
+- Registrar **receitas** e **despesas**;
+- Visualizar **saldo do mês**, total de entradas e saídas;
+- Acompanhar **gráfico de gastos por categoria**;
+- Gerenciar **categorias personalizadas**;
+- Visualizar a lista de transações do mês e **excluir lançamentos**.
+
+O projeto foi desenvolvido com **Next.js (App Router)**, **Prisma** e **PostgreSQL**, usando **JWT** para autenticação e **Zod** para validação de dados.  
+O frontend e as rotas de API rodam na **Vercel**, enquanto o banco de dados está hospedado no **Render**.
+
+---
+
+## ✨ Funcionalidades
+
+- 🔐 **Autenticação com JWT**
+  - Registro de usuário;
+  - Login com geração de token;
+  - Armazenamento do token em cookie (HTTP‑only);
+  - Middleware protegendo rotas como `/dashboard`.
+
+- 📊 **Dashboard financeiro**
+  - Total de receitas (`income`);
+  - Total de despesas (`expense`);
+  - Saldo do mês (`balance`);
+  - Lista de transações;
+  - Gráfico de gastos por categoria (Recharts).
+
+- 🏷️ **Categorias**
+  - Categorias padrão (globais);
+  - Categorias do próprio usuário;
+  - Criação de novas categorias;
+  - Exclusão de categorias do usuário (com remoção segura da referência nas transações).
+
+- 💸 **Transações**
+  - Criação de transações com:
+    - tipo (`INCOME`, `EXPENSE`);
+    - valor;
+    - data;
+    - descrição;
+    - categoria;
+    - carteira (wallet);
+  - Atualização automática do saldo da carteira;
+  - Exclusão de transações.
+
+- ✅ **Validação com Zod**
+  - Schemas de validação para login, registro, categorias e transações;
+  - Validação **tanto no frontend quanto no backend**, evitando dados inválidos.
+
+---
+
+## 🧰 Tecnologias utilizadas
+
+- **Frontend & Backend**
+  - [Next.js](https://nextjs.org/) (App Router)
+  - [React](https://react.dev/)
+  - Rotas API internas (`src/app/api`)
+
+- **Banco de dados & ORM**
+  - [PostgreSQL](https://www.postgresql.org/)
+  - [Prisma ORM](https://www.prisma.io/)
+
+- **Autenticação & Segurança**
+  - [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) (JWT)
+  - [bcrypt](https://github.com/kelektiv/node.bcrypt.js) para hash de senhas
+  - Cookies para persistir o token no navegador
+
+- **Validação**
+  - [Zod](https://zod.dev/) para validação de schemas (login, registro, categorias, transações)
+
+- **UI & Gráficos**
+  - [Tailwind CSS](https://tailwindcss.com/) para estilização
+  - [Recharts](https://recharts.org/en-US/) para gráficos (pizza, etc.)
+
+- **Infraestrutura**
+  - [Vercel](https://vercel.com/) – deploy do Next.js (frontend + API)
+  - [Render](https://render.com/) – hospedagem do banco PostgreSQL
+
+---
+
+## 📂 Estrutura básica do projeto
+
+```bash
+fintrack/ (ou saasorc/)
+├─ prisma/
+│  ├─ schema.prisma        # Definição do modelo de dados
+│  └─ migrations/         # Migrations do Prisma
+├─ src/
+│  ├─ app/
+│  │  ├─ api/
+│  │  │  ├─ auth/
+│  │  │  │  ├─ login/route.ts      # Login do usuário
+│  │  │  │  ├─ register/route.ts   # Registro do usuário
+│  │  │  ├─ summary/route.ts       # Resumo financeiro (income, expense, balance)
+│  │  │  ├─ transactions/
+│  │  │  │  ├─ route.ts            # Listar/criar transações
+│  │  │  │  ├─ [id]/route.ts       # Deletar transação
+│  │  │  ├─ categorias/
+│  │  │  │  ├─ route.ts            # Listar/criar categorias
+│  │  │  │  ├─ [id]/route.ts       # Deletar categoria
+│  │  ├─ dashboard/page.tsx        # Página principal do usuário
+│  │  ├─ login/page.tsx            # Tela de login
+│  │  ├─ register/page.tsx         # Tela de registro
+│  ├─ lib/
+│  │  ├─ prisma.ts                 # Instância do PrismaClient
+│  │  ├─ auth.ts                   # Funções de JWT e bcrypt
+│  │  ├─ validators.ts             # Schemas Zod (login, registro, transações, categorias)
+│  ├─ components/
+│     ├─ transaction-form.tsx      # Formulário de criação de transação
+├─ public/
+├─ .env
+├─ next.config.ts
+├─ tailwind.config.js
+├─ tsconfig.json
+├─ package.json
+└─ README.md
+```
+
+---
+
+## 🚀 Como rodar o projeto localmente
+
+### 1. Clonar o repositório
+
+```bash
+git clone https://github.com/seu-usuario/seu-repo.git
+cd seu-repo
+```
+
+### 2. Instalar dependências
+
+```bash
+npm install
+# ou
+yarn install
+# ou
+pnpm install
+```
+
+### 3. Configurar variáveis de ambiente
+
+Crie um arquivo `.env` na raiz do projeto com:
+
+```env
+DATABASE_URL="postgresql://usuario:senha@host:porta/nome_db"
+JWT_SECRET="uma_chave_bem_aleatoria"
+```
+
+> **Importante:**  
+> - Não commitar o arquivo `.env` no Git.  
+> - Use uma `JWT_SECRET` forte em produção.
+
+### 4. Rodar migrations do Prisma
+
+```bash
+npx prisma migrate dev
+# ou, se o banco já existe em produção:
+# npx prisma migrate deploy
+```
+
+### 5. Iniciar o servidor de desenvolvimento
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse: http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🌐 Deploy
 
-## Learn More
+### Vercel (Next.js)
 
-To learn more about Next.js, take a look at the following resources:
+1. Suba o código para um repositório no GitHub.
+2. No painel da Vercel:
+   - Clique em **New Project** e selecione o repositório.
+   - Configure as variáveis de ambiente em **Settings → Environment Variables**:
+     - `DATABASE_URL` → URL do PostgreSQL no Render
+     - `JWT_SECRET` → chave secreta usada para assinar/verificar tokens JWT
+3. Faça o deploy.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Banco de dados (Render)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Crie um banco **PostgreSQL** no Render.
+- Copie a **External Database URL**.
+- Use essa URL como valor de `DATABASE_URL` em:
+  - `.env` local
+  - Variáveis de ambiente da Vercel (produção)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔐 Autenticação (JWT + cookies)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Na API (`/api/auth/login` e `/api/auth/register`), ao autenticar o usuário:
+  - É gerado um **JWT** com `jsonwebtoken` (`signJwt`).
+  - O token é enviado como **cookie**.
+- Em rotas protegidas (`/api/summary`, `/api/transactions`, etc.):
+  - O token é lido do cookie;
+  - Validado com `verifyJwt`;
+  - O `userId` extraído do token é usado pelo Prisma para filtrar os dados do usuário.
+
+---
+
+## ✅ Validação com Zod
+
+Os schemas Zod (em `lib/validators.ts`) garantem que os dados recebidos são válidos antes de serem processados:
+
+- `loginSchema` — valida email e senha;
+- `registerSchema` — valida nome, email, senha;
+- `transactionSchema` — valida criação de transações;
+- `categorySchema` — valida criação de categorias.
+
+Essa validação é usada tanto no **frontend** (antes de chamar a API) quanto no **backend** (nas rotas `/api`), aumentando a segurança e robustez da aplicação.
+
+---
+
+## 📜 Licença
+
+Este projeto pode ser usado como base de estudos ou como boilerplate para sistemas de controle financeiro em Next.js.  
+Adapte, melhore e personalize conforme suas necessidades.
+
+---
